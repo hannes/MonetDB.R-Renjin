@@ -378,16 +378,15 @@ names(.monetTypes) <- c(c("TINYINT", "SMALLINT", "INT", "BIGINT", "HUGEINT", "RE
 		"VIEW", "WHEN", "WHENEVER", "WHERE", "WITH", "WORK", "WRITE", "YEAR",
 		"ZONE")
 
+# this is a old DBI method that is used by sqlsurvey...
 make.db.names <- function(conn, snames, keywords = .SQL92Keywords, 
 		unique = TRUE, allow.keywords = TRUE) {
-	print(snames)
 	makeUnique <- function(x, sep = "_") {
 		if(length(x)==0) return(x)
 		out <- x
 		lc <- make.names(tolower(x), unique=FALSE)
 		i <- duplicated(lc)
 		lc <- make.names(lc, unique = TRUE)
-		#if (length(which(i)) > 0) # TODO: check why this is no longer neccessary
 		out[i] <- paste(out[i], substring(lc[i], first=nchar(out[i])+1), sep=sep)
 		out
 	}
