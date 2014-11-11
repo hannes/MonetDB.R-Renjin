@@ -91,7 +91,7 @@ dbConnect.MonetDBDriver <- function(drv, dbname="demo", user="monetdb",
 		..., url="") {
 	if (substring(dbname, 1, 5) != "jdbc:") {
 		if (substring(dbname, 1, 10) == "monetdb://") {
-			url <- paste("jdbc://", dbname, sep="")
+			url <- paste("jdbc:", dbname, sep="")
 		} else {
 			url <- paste("jdbc:monetdb://", host,":", as.integer(port), "/", dbname, sep="")
 		}
