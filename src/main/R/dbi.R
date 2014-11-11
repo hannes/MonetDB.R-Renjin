@@ -246,7 +246,7 @@ dbWriteTable.MonetDBConnection <- function(conn, name, value, overwrite=FALSE,
 	if (overwrite && append) {
 		stop("Setting both overwrite and append to true makes no sense.")
 	}
-	qname <- .make.db.names(name)
+	qname <- make.db.names(conn, name)
 	if (dbExistsTable(conn, qname)) {
 		if (overwrite) dbRemoveTable(conn, qname)
 		if (!overwrite && !append) stop("Table ", qname, " already exists. Set overwrite=TRUE if you want 
@@ -257,7 +257,7 @@ dbWriteTable.MonetDBConnection <- function(conn, name, value, overwrite=FALSE,
 		fts <- sapply(value, function(x) {
 					dbDataType(conn, x)
 				})
-		fdef <- paste(.make.db.names(names(value)), fts, collapse=', ')
+		fdef <- paste(make.db.names(conn, names(value)), fts, collapse=', ')
 		ct <- paste("CREATE TABLE ", qname, " (", fdef, ")", sep= '')
 		dbSendUpdate(conn, ct)
 	}
@@ -317,7 +317,7 @@ monet.read.csv <- monetdb.read.csv <- function(conn, files, tablename, nrows, he
 	dbGetQuery(conn, paste("select count(*) from", tablename))
 }
 
-
+# TODO: this breaks if the value contains a ?, fix this (also in MonetDB.R!)
 .bindParameters <- function(con, statement, param) {
 	for (i in 1:length(param)) {
 		value <- param[[i]]
@@ -329,7 +329,7 @@ monet.read.csv <- monetdb.read.csv <- function(conn, files, tablename, nrows, he
 		else if (valueClass == c("raw"))
 			stop("raw() data is so far only supported when reading from BLOBs")
 		else
-			statement <- sub("?", paste("'", dbQuoteString(con, toString(value)), "'", sep=""), statement, 
+			statement <- sub("?", paste(dbQuoteString(con, toString(value)), sep=""), statement, 
 					fixed=TRUE)
 	}
 	statement
@@ -378,8 +378,9 @@ names(.monetTypes) <- c(c("TINYINT", "SMALLINT", "INT", "BIGINT", "HUGEINT", "RE
 		"VIEW", "WHEN", "WHENEVER", "WHERE", "WITH", "WORK", "WRITE", "YEAR",
 		"ZONE")
 
-.make.db.names <- function(snames, keywords = .SQL92Keywords, 
+make.db.names <- function(conn, snames, keywords = .SQL92Keywords, 
 		unique = TRUE, allow.keywords = TRUE) {
+	print(snames)
 	makeUnique <- function(x, sep = "_") {
 		if(length(x)==0) return(x)
 		out <- x
