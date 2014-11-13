@@ -42,7 +42,7 @@ public class ResultSetConverter {
 	}
 
 	// TODO: consider blob -> raw, too? bit esoteric.
-	private static enum RTYPE {
+	public static enum RTYPE {
 		INTEGER, NUMERIC, CHARACTER, LOGICAL
 	};
 
