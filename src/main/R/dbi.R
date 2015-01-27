@@ -1,14 +1,14 @@
 # JDBC DBI for Renjin, <hannes@cwi.nl>
 
-JDBC <- function(drvname, ...) {
+JDBC <- function(jclass, rclass, ...) {
 	# this will fail if the driver is not in the classpath
-	# FIXME import(drvname)
-	structure(list(drvname = drvname, ...), class = c("JDBCDriver", "DBIDriver"))
+	import(java.lang.Class)
+	Class$forName(jclass)
+	structure(list(...), class = c(rclass, "JDBCDriver", "DBIDriver"))
 }
 # TODO: provide same API as the MonetDB.R package...
 MonetDB.R <- MonetDB <- function() {
-	import(nl.cwi.monetdb.jdbc.MonetDriver)
-	structure(list(), class = c("MonetDBDriver", "JDBCDriver", "DBIDriver"))
+	JDBC("nl.cwi.monetdb.jdbc.MonetDriver", "MonetDBDriver")
 } 
 
 # some DBI methods in S3 form for source compatibility
@@ -86,7 +86,7 @@ dbConnect.JDBCDriver <- function(drv, url, username, password) {
 }
 
 # this takes the same parameters as dbConnect() parameters in MonetDB.R for compatibility
-dbConnect.MonetDBDriver <- function(drv, dbname="demo", user="monetdb", 
+dbConnect.MonetDBDriver <- function(drv, dbname="demo", username="monetdb", 
 		password="monetdb", host="localhost", port=50000L, timeout=86400L, wait=FALSE, language="sql", 
 		..., url="") {
 	if (substring(dbname, 1, 5) != "jdbc:") {
@@ -99,7 +99,7 @@ dbConnect.MonetDBDriver <- function(drv, dbname="demo", user="monetdb",
 		url <- dbname
 	}
 	# TODO: auto-assign a specific class to the connection based on the driver name for ez overloading
-	structure(list(conn = dbConnect.JDBCDriver(drv, url, user, password)$conn), class = c("MonetDBConnection", "JDBCConnection"))
+	structure(list(conn = dbConnect.JDBCDriver(drv, url, username, password)$conn), class = c("MonetDBConnection", "JDBCConnection"))
 }
 
 dbSendQuery.JDBCConnection <- function (con, qry) {

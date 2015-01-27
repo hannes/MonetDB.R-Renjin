@@ -13,7 +13,7 @@ dbname <- "mTests_clients_R"
 dbport <- 50000
 tname <- "monetdbtest"
 drv <- dbDriver("MonetDB")
-drv <- MonetDB.R() # just to make sure this works, too
+drv <- MonetDB.R()
 
 con <- conn <- dbConnect(drv, port=dbport, dbname=dbname, wait=T)
 
